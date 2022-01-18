@@ -62,14 +62,14 @@
     <Compile Include="History.cs" />
     <Compile Include="ImageFolderComparer.cs" />
     <Compile Include="ImageFolderCleaner.cs" />
-    <Compile Include="ImageUtil.cs" />
+    <Compile Include="Utils\ImageUtil.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="ProgressInfoEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SameFilenameEventArgs.cs" />
     <Compile Include="StepsCountComputedEventArgs.cs" />
     <Compile Include="StringContainer.cs" />
-    <Compile Include="StringUtil.cs" />
+    <Compile Include="Utils\StringUtil.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
