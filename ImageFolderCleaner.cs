@@ -6,19 +6,11 @@ using ImgComparer.Utils;
 
 namespace ImgComparer
 {
-    class ImageFolderCleaner
+    class ImageFolderCleaner : TaskRunner
     {
         public delegate void FileDeletedDelegate(object sender, FileEventArgs args);
         public event FileDeletedDelegate FileDeletedEvent;
 
-        public delegate void StepsCountComputedDelegate(object sender, StepsCountComputedEventArgs args);
-        public event StepsCountComputedDelegate stepsCountComputedEvent;
-
-        public event FolderComparer.ProgressInfoDelegate progressInfoEvent;
-
-        public event EventHandler CleanFinishedEvent;
-
-        Thread thread;
         private string path;
         private Regex imageRegex = new Regex(@".*\.(jpg|png|jpeg)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
@@ -63,16 +55,17 @@ namespace ImgComparer
         private IList<string> filteredFiles;
         public IList<string> FilteredFiles { get { return filteredFiles; } }
 
-        private void task()
+        protected override void task()
         {
             IList<string> files = getFiles(path, imageRegex);
             filteredFiles = files;
 
-            stepsCountComputedEvent?.Invoke(this, new StepsCountComputedEventArgs(files.Count));
+            invokeStepsCountEvent(files.Count);
+            
 
             IDictionary<string, string> filenameMap = new Dictionary<string, string>();
             int progress = 0;
-            foreach(string imgPath in files)
+            foreach (string imgPath in files)
             {
                 progress++;
                 string filename = System.IO.Path.GetFileName(imgPath);
@@ -89,27 +82,7 @@ namespace ImgComparer
                 {
                     filenameMap.Add(filename, imgPath);
                 }
-                progressInfoEvent?.Invoke(this, new ProgressInfoEventArgs(progress));
-            }
-            CleanFinishedEvent?.Invoke(this, null);
-        }
-
-        public void Start()
-        {
-            if (thread != null)
-            {
-                thread.Abort();
-                thread = null;
-            }
-            thread = new Thread(new ThreadStart(task));
-            thread.Start();
-        }
-
-        public void WaitTerminate()
-        {
-            if (thread != null && thread.IsAlive)
-            {
-                thread.Join();
+                invokeProgressEvent(progress);
             }
         }
     }

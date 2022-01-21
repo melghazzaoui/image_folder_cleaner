@@ -35,21 +35,21 @@
             this.btnSelectTarget = new System.Windows.Forms.Button();
             this.txtTargetFolder = new System.Windows.Forms.TextBox();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.gbMode = new System.Windows.Forms.GroupBox();
+            this.radioClean = new System.Windows.Forms.RadioButton();
+            this.radioComparison = new System.Windows.Forms.RadioButton();
             this.panel2 = new System.Windows.Forms.Panel();
             this.btnCompare = new System.Windows.Forms.Button();
             this.btnAbort = new System.Windows.Forms.Button();
             this.panelLog = new System.Windows.Forms.Panel();
             this.richTextLog = new System.Windows.Forms.RichTextBox();
             this.progressBarComparer = new System.Windows.Forms.ProgressBar();
-            this.gbMode = new System.Windows.Forms.GroupBox();
-            this.radioComparison = new System.Windows.Forms.RadioButton();
-            this.radioClean = new System.Windows.Forms.RadioButton();
             this.gbRefFolder.SuspendLayout();
             this.gbTargetFolder.SuspendLayout();
             this.panel1.SuspendLayout();
+            this.gbMode.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panelLog.SuspendLayout();
-            this.gbMode.SuspendLayout();
             this.SuspendLayout();
             // 
             // gbRefFolder
@@ -143,6 +143,41 @@
             this.panel1.TabIndex = 2;
             this.panel1.Click += new System.EventHandler(this.panel1_Click);
             // 
+            // gbMode
+            // 
+            this.gbMode.Controls.Add(this.radioClean);
+            this.gbMode.Controls.Add(this.radioComparison);
+            this.gbMode.Location = new System.Drawing.Point(4, 3);
+            this.gbMode.Name = "gbMode";
+            this.gbMode.Size = new System.Drawing.Size(1151, 85);
+            this.gbMode.TabIndex = 3;
+            this.gbMode.TabStop = false;
+            this.gbMode.Text = "Mode";
+            // 
+            // radioClean
+            // 
+            this.radioClean.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.radioClean.AutoSize = true;
+            this.radioClean.Location = new System.Drawing.Point(7, 53);
+            this.radioClean.Name = "radioClean";
+            this.radioClean.Size = new System.Drawing.Size(198, 17);
+            this.radioClean.TabIndex = 1;
+            this.radioClean.Text = "Clean one folder (remove duplicated)";
+            this.radioClean.UseVisualStyleBackColor = true;
+            // 
+            // radioComparison
+            // 
+            this.radioComparison.AutoSize = true;
+            this.radioComparison.Checked = true;
+            this.radioComparison.Location = new System.Drawing.Point(7, 20);
+            this.radioComparison.Name = "radioComparison";
+            this.radioComparison.Size = new System.Drawing.Size(176, 17);
+            this.radioComparison.TabIndex = 0;
+            this.radioComparison.TabStop = true;
+            this.radioComparison.Text = "Comparison (remove duplicated)";
+            this.radioComparison.UseVisualStyleBackColor = true;
+            this.radioComparison.CheckedChanged += new System.EventHandler(this.radioComparison_CheckedChanged);
+            // 
             // panel2
             // 
             this.panel2.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
@@ -186,7 +221,7 @@
             this.panelLog.Controls.Add(this.richTextLog);
             this.panelLog.Location = new System.Drawing.Point(12, 315);
             this.panelLog.Name = "panelLog";
-            this.panelLog.Size = new System.Drawing.Size(1160, 566);
+            this.panelLog.Size = new System.Drawing.Size(1160, 374);
             this.panelLog.TabIndex = 3;
             // 
             // richTextLog
@@ -198,7 +233,7 @@
             this.richTextLog.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.richTextLog.Location = new System.Drawing.Point(3, 4);
             this.richTextLog.Name = "richTextLog";
-            this.richTextLog.Size = new System.Drawing.Size(1152, 557);
+            this.richTextLog.Size = new System.Drawing.Size(1152, 365);
             this.richTextLog.TabIndex = 0;
             this.richTextLog.Text = "";
             // 
@@ -211,46 +246,11 @@
             this.progressBarComparer.Size = new System.Drawing.Size(1160, 23);
             this.progressBarComparer.TabIndex = 4;
             // 
-            // gbMode
-            // 
-            this.gbMode.Controls.Add(this.radioClean);
-            this.gbMode.Controls.Add(this.radioComparison);
-            this.gbMode.Location = new System.Drawing.Point(4, 3);
-            this.gbMode.Name = "gbMode";
-            this.gbMode.Size = new System.Drawing.Size(1151, 85);
-            this.gbMode.TabIndex = 3;
-            this.gbMode.TabStop = false;
-            this.gbMode.Text = "Mode";
-            // 
-            // radioComparison
-            // 
-            this.radioComparison.AutoSize = true;
-            this.radioComparison.Checked = true;
-            this.radioComparison.Location = new System.Drawing.Point(7, 20);
-            this.radioComparison.Name = "radioComparison";
-            this.radioComparison.Size = new System.Drawing.Size(176, 17);
-            this.radioComparison.TabIndex = 0;
-            this.radioComparison.TabStop = true;
-            this.radioComparison.Text = "Comparison (remove duplicated)";
-            this.radioComparison.UseVisualStyleBackColor = true;
-            this.radioComparison.CheckedChanged += new System.EventHandler(this.radioComparison_CheckedChanged);
-            // 
-            // radioClean
-            // 
-            this.radioClean.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.radioClean.AutoSize = true;
-            this.radioClean.Location = new System.Drawing.Point(7, 53);
-            this.radioClean.Name = "radioClean";
-            this.radioClean.Size = new System.Drawing.Size(198, 17);
-            this.radioClean.TabIndex = 1;
-            this.radioClean.Text = "Clean one folder (remove duplicated)";
-            this.radioClean.UseVisualStyleBackColor = true;
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1184, 893);
+            this.ClientSize = new System.Drawing.Size(1184, 701);
             this.Controls.Add(this.progressBarComparer);
             this.Controls.Add(this.panelLog);
             this.Controls.Add(this.panel1);
@@ -263,10 +263,10 @@
             this.gbTargetFolder.ResumeLayout(false);
             this.gbTargetFolder.PerformLayout();
             this.panel1.ResumeLayout(false);
-            this.panel2.ResumeLayout(false);
-            this.panelLog.ResumeLayout(false);
             this.gbMode.ResumeLayout(false);
             this.gbMode.PerformLayout();
+            this.panel2.ResumeLayout(false);
+            this.panelLog.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }

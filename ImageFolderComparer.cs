@@ -8,9 +8,6 @@ namespace ImgComparer
         public delegate void FilesComparedDelegate(object sender, FilesComparedEventArgs args);
         public event FilesComparedDelegate FilesComparedEvent;
 
-        public delegate void ExceptionRaisedDelegate(object sender, UnhandledExceptionEventArgs args);
-        public event ExceptionRaisedDelegate ExceptionRaisedEvent;
-
         public ImageFolderComparer(string referenceFolderPath, string targetFolderPath)
             : base(referenceFolderPath, targetFolderPath, @"(.*\.jpg)|(.*\.png)")
         {

@@ -16,6 +16,8 @@ namespace ImgComparer
         private string refFolderPath;
         private string targetFolderPath;
         private ImageFolderComparer imageFolderComparer;
+        private ImageFolderCleaner cleaner;
+        private TaskRunner taskRunner;
         private ListBox listBox = null;
         private TextBox focusedTextBox;
         private string text_backup;
@@ -124,15 +126,13 @@ namespace ImgComparer
                 history.Add(targetFolderPath);
 
                 imageFolderComparer = new ImageFolderComparer(refFolderPath, targetFolderPath);
-                imageFolderComparer.comparisonTerminatedEvent += ImageFolderComparer_comparisonTerminatedEvent;
+                taskRunner = imageFolderComparer;
+                taskRunner.TaskFinishedEvent += ImageFolderComparer_TaskFinishedEvent;
                 imageFolderComparer.FilesComparedEvent += ImageFolderComparer_FilesComparedEvent;
-                imageFolderComparer.ExceptionRaisedEvent += ImageFolderComparer_ExceptionRaisedEvent;
-                imageFolderComparer.stepsCountComputedEvent += ImageFolderComparer_stepsCountComputedEvent;
-                imageFolderComparer.progressInfoEvent += ImageFolderComparer_progressInfoEvent;
+                
+                
                 clearLog();
                 addLogLine("Comparison started");
-
-                imageFolderComparer.compare();
             }
             else
             {
@@ -142,21 +142,21 @@ namespace ImgComparer
                 txtRefFolder.Enabled = false;
                 progressBarComparer.Value = 0;
 
-                ImageFolderCleaner cleaner = new ImageFolderCleaner(txtRefFolder.Text);
+                cleaner = new ImageFolderCleaner(txtRefFolder.Text);
+                taskRunner = cleaner;
                 richTextLog.Text = "";
                 cleaner.FileDeletedEvent += Cleaner_FileDeletedEvent;
-                cleaner.CleanFinishedEvent += Cleaner_CleanFinishedEvent;
-                cleaner.stepsCountComputedEvent += ImageFolderComparer_stepsCountComputedEvent;
-                cleaner.progressInfoEvent += ImageFolderComparer_progressInfoEvent;
+                cleaner.TaskFinishedEvent += Cleaner_TaskFinishedEvent;
                 clearLog();
                 addLogLine("Clean started");
-                cleaner.Start();
             }
+
+            taskRunner.stepsCountComputedEvent += ImageFolderComparer_stepsCountComputedEvent;
+            taskRunner.progressInfoEvent += ImageFolderComparer_progressInfoEvent;
+            taskRunner.Run();
 
             history.Add(refFolderPath);
             history.SaveToFile(historyFilePath);
-
-            //rtbLog.Text = sb.ToString();
         }
 
         private void ImageFolderComparer_progressInfoEvent(object sender, ProgressInfoEventArgs args)
@@ -181,17 +181,6 @@ namespace ImgComparer
             }            
         }
 
-        private void Action_ExceptionRaised(UnhandledExceptionEventArgs args)
-        {
-            Exception exc = args.ExceptionObject as Exception;
-            addLogLine( exc.Message);
-        }
-
-        private void ImageFolderComparer_ExceptionRaisedEvent(object sender, UnhandledExceptionEventArgs args)
-        {
-            Invoke(new Action(() => Action_ExceptionRaised(args)));
-        }
-
         private void Action_FileDeleted(string file)
         {
            addLogLine(file + " deleted");
@@ -202,7 +191,7 @@ namespace ImgComparer
             addLogLine( file + " moved to " + newFilePath);
         }
 
-        private void Action_ComparisonTerminated()
+        private void Action_ComparisonTerminated(TaskFinishedEventArgs args)
         {
             btnSelectRef.Enabled = true;
             btnSelectTarget.Enabled = true;
@@ -212,8 +201,13 @@ namespace ImgComparer
             txtTargetFolder.Enabled = true;
             progressBarComparer.Value = progressBarComparer.Maximum;
 
-            addLogLine("Comparison terminated.");
-            MessageBox.Show("Folder comparison terminated!");
+            string msg = "Comparison terminated.";
+            if (args.Status == TaskFinishedEventArgs.StatusValues.FAILURE)
+            {
+                msg += " But with some failures (" + args.Msg + ")";
+            }
+            addLogLine(msg);
+            MessageBox.Show(msg);
         }
 
         private void ImageFolderComparer_FilesComparedEvent(object sender, FilesComparedEventArgs args)
@@ -235,9 +229,9 @@ namespace ImgComparer
             }
         }
 
-        private void ImageFolderComparer_comparisonTerminatedEvent(object sender, EventArgs e)
+        private void ImageFolderComparer_TaskFinishedEvent(object sender, TaskFinishedEventArgs args)
         {
-            Invoke(new Action(() => Action_ComparisonTerminated()));
+            Invoke(new Action(() => Action_ComparisonTerminated(args)));
         }
 
         private IList<string> getDriveDirectories(string driveName)
@@ -410,10 +404,9 @@ namespace ImgComparer
 
         private void btnAbort_Click(object sender, EventArgs e)
         {
-            if (imageFolderComparer != null)
+            if (taskRunner != null)
             {
-                imageFolderComparer.abort();
-                Action_ComparisonTerminated();
+                taskRunner.Abort();
             }
         }
 
@@ -586,7 +579,7 @@ namespace ImgComparer
         }
 
 
-        private void Action_CleanFinished()
+        private void Action_CleanFinished(TaskFinishedEventArgs args)
         {
             btnSelectRef.Enabled = true;
             btnCompare.Enabled = true;
@@ -594,15 +587,24 @@ namespace ImgComparer
             txtRefFolder.Enabled = true;
             progressBarComparer.Value = progressBarComparer.Maximum;
 
-            addLogLine("Clean finished.");
+            string msg = "Clean finished.";
+            if (args.Status == TaskFinishedEventArgs.StatusValues.FAILURE)
+            {
+                msg += " But with some failures";
+            }
+            if (args.Msg != null)
+            {
+                msg += " (" + args.Msg + ")";
+            }
+            addLogLine(msg);
 
             refreshPathsDataAndUI();
-            MessageBox.Show("Clean finished!");
+            MessageBox.Show(msg);
         }
 
-        private void Cleaner_CleanFinishedEvent(object sender, EventArgs e)
+        private void Cleaner_TaskFinishedEvent(object sender, TaskFinishedEventArgs args)
         {
-            Invoke(new Action(() => Action_CleanFinished()));
+            Invoke(new Action(() => Action_CleanFinished(args)));
         }
 
         private void Cleaner_FileDeletedEvent(object sender, FileEventArgs args)

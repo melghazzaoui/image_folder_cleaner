@@ -7,21 +7,13 @@ using ImgComparer.Utils;
 
 namespace ImgComparer
 {
-    abstract class FolderComparer
+    abstract class FolderComparer : TaskRunner
     {
-        private Thread thread;
-        private bool abortRequestPosted;
         private string refFolderPath;
         private string targetFolderPath;
         private string filterPattern;
         public delegate void SameFilenameFoundDelegate(object sender, SameFilenameEventArgs args);
         public event SameFilenameFoundDelegate sameFilenameFoundEvent;
-        public event EventHandler comparisonTerminatedEvent;
-        public delegate void StepsCountComputedDelegate(object sender, StepsCountComputedEventArgs args);
-        public event StepsCountComputedDelegate stepsCountComputedEvent;
-        public delegate void ProgressInfoDelegate(object sender, ProgressInfoEventArgs args);
-        public event ProgressInfoDelegate progressInfoEvent;
-
 
         public FolderComparer(string refFolderPath, string targetFolderPath, string filterPattern)
         {
@@ -51,7 +43,7 @@ namespace ImgComparer
             return fileMap;
         }
 
-        private void task()
+        protected override void task()
         {
             IDictionary<string, string> refFiles = getDirectoryFiles(refFolderPath, filterPattern);
             IDictionary<string, string> targetFiles = getDirectoryFiles(targetFolderPath, filterPattern);
@@ -69,12 +61,12 @@ namespace ImgComparer
             refFiles.Clear();
             targetFiles.Clear();
 
-            stepsCountComputedEvent?.Invoke(this, new StepsCountComputedEventArgs(sameFilenameMap.Count));
+            invokeStepsCountEvent(sameFilenameMap.Count);
 
             int i = 0;
             foreach (KeyValuePair<string, string[]> kv in sameFilenameMap)
             {
-                if (abortRequestPosted)
+                if (IsAbortRequestPosted())
                 {
                     return;
                 }
@@ -93,33 +85,13 @@ namespace ImgComparer
                     handleFilesDifferent(path1, path2);
                 }
 
-                progressInfoEvent?.Invoke(this, new ProgressInfoEventArgs(i));
+                invokeProgressEvent(i);
             }
-            comparisonTerminatedEvent(this, new EventArgs());
         }
 
         protected abstract bool filesEqual(string file1, string file2);
         protected abstract void handleFilesEqual(string file1, string file2);
         protected abstract void handleFilesDifferent(string file1, string file2);
-
-        public void compare()
-        {
-            if (thread != null && thread.IsAlive)
-            {
-                thread.Abort();
-            }
-            abortRequestPosted = false;
-            thread = new Thread(new ThreadStart(task));
-            thread.Start();
-        }
-
-        public void abort()
-        {
-            abortRequestPosted = true;
-            thread.Abort();
-            abortRequestPosted = false;
-            thread = null;
-        }
 
         private static string toLowerTrimEnd(string str, params char[]trimChars)
         {

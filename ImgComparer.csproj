@@ -62,6 +62,8 @@
     <Compile Include="History.cs" />
     <Compile Include="ImageFolderComparer.cs" />
     <Compile Include="ImageFolderCleaner.cs" />
+    <Compile Include="TaskFinishedEventArgs.cs" />
+    <Compile Include="TaskRunner.cs" />
     <Compile Include="Utils\ImageUtil.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="ProgressInfoEventArgs.cs" />
