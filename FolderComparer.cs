@@ -43,7 +43,7 @@ namespace ImgComparer
             return fileMap;
         }
 
-        protected override void task()
+        protected override bool task()
         {
             IDictionary<string, string> refFiles = getDirectoryFiles(refFolderPath, filterPattern);
             IDictionary<string, string> targetFiles = getDirectoryFiles(targetFolderPath, filterPattern);
@@ -68,7 +68,7 @@ namespace ImgComparer
             {
                 if (IsAbortRequestPosted())
                 {
-                    return;
+                    return false;
                 }
                 ++i;
                 string path1 = kv.Value[0];
@@ -87,6 +87,7 @@ namespace ImgComparer
 
                 invokeProgressEvent(i);
             }
+            return true;
         }
 
         protected abstract bool filesEqual(string file1, string file2);

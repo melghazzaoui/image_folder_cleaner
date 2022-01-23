@@ -21,7 +21,7 @@ namespace ImgComparer
         private Thread thread;
         private bool abortRequestPosted;
 
-        protected abstract void task();
+        protected abstract bool task();
 
         protected void invokeStepsCountEvent(int count)
         {
@@ -37,9 +37,10 @@ namespace ImgComparer
         {
             TaskFinishedEventArgs.StatusValues status = TaskFinishedEventArgs.StatusValues.SUCCESS;
             string msg = null;
+            bool res = true;
             try
             {
-                task();
+                res = task();
             }
             catch (Exception e)
             {
@@ -48,6 +49,10 @@ namespace ImgComparer
             }
             finally
             {
+                if (!res)
+                {
+                    status = TaskFinishedEventArgs.StatusValues.FAILURE;
+                }
                 TaskFinishedEvent?.Invoke(this, new TaskFinishedEventArgs(status, msg));
             }
         }

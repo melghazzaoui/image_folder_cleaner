@@ -65,10 +65,21 @@ namespace ImgComparer
             richTextLog.Text = "";
         }
 
-        
+
+        private bool test(object o)
+        {
+            string msg = o as string;
+            System.Console.WriteLine(msg);
+            return true;
+        }
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            string msg = "Hello!!!";
+            GenericTaskRunner gen = new GenericTaskRunner(test, msg);
+            gen.TaskFinishedEvent += Gen_TaskFinishedEvent;
+            gen.Run();
+
             txtRefFolder.Text = System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             txtTargetFolder.Text = System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             text_backup = "";
@@ -78,7 +89,17 @@ namespace ImgComparer
 
             btnAbort.Enabled = false;
             richTextLog.ReadOnly = true;
-            refreshPathsDataAndUI();            
+            refreshPathsDataAndUI();
+        }
+
+        private void Action_GenTaskFinished(TaskFinishedEventArgs args)
+        {
+            //MessageBox.Show(args.Status.ToString() + (args.Msg != null ? (" (" + args.Msg + ")") : ""));
+        }
+
+        private void Gen_TaskFinishedEvent(object sender, TaskFinishedEventArgs args)
+        {
+            Invoke(new Action(() => Action_GenTaskFinished(args)));
         }
 
         private void btnSelectRef_Click(object sender, EventArgs e)

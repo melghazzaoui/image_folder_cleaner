@@ -55,13 +55,12 @@ namespace ImgComparer
         private IList<string> filteredFiles;
         public IList<string> FilteredFiles { get { return filteredFiles; } }
 
-        protected override void task()
+        protected override bool task()
         {
             IList<string> files = getFiles(path, imageRegex);
             filteredFiles = files;
 
             invokeStepsCountEvent(files.Count);
-            
 
             IDictionary<string, string> filenameMap = new Dictionary<string, string>();
             int progress = 0;
@@ -84,6 +83,7 @@ namespace ImgComparer
                 }
                 invokeProgressEvent(progress);
             }
+            return true;
         }
     }
 }
